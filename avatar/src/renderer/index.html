@@ -10,15 +10,28 @@
     <!-- Kontainer three.js (canvas dibuat dinamis) -->
     <div id="app" class="stage"></div>
 
+    <!-- Bubble status di atas avatar (thinking/processing/speaking/idle) -->
+    <div id="status-bubble" class="status-bubble" hidden></div>
+
     <!-- Area drag untuk memindahkan window (karena frameless) -->
     <div id="drag-handle" class="drag-handle" title="Seret untuk memindahkan"></div>
 
-    <!-- Input teks mini (mock, Fase 1) -->
+    <!-- Ikon komentar (trigger buka/tutup bottom sheet) -->
+    <button id="comment-toggle" class="comment-toggle" title="Buka chat">💬</button>
+
+    <!-- Tombol animasi/emote (DVD bounce) -->
+    <button id="dvd-btn" class="emote-btn" title="Animasi DVD">📀</button>
+
+    <!-- Backdrop (klik luar untuk menutup panel) -->
+    <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+
+    <!-- Bottom sheet / chat drawer -->
     <div id="chat" class="chat">
       <div id="chat-log" class="chat-log"></div>
       <form id="chat-form" class="chat-form">
         <input id="chat-input" type="text" placeholder="Ketik pesan..." autocomplete="off" />
         <button type="submit">Kirim</button>
+        <button type="button" id="mic-btn" title="Rekam suara">🎤</button>
       </form>
     </div>
 

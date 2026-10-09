@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, protocol, net } from 'electron'
+import { app, BrowserWindow, ipcMain, protocol, net, dialog, screen } from 'electron'
 import { join, dirname, basename, extname } from 'path'
 import { readFile } from 'fs/promises'
 
@@ -13,6 +13,62 @@ import { readFile } from 'fs/promises'
 
 let launcherWindow = null
 let avatarWindow = null
+
+// --- Animasi "DVD bounce" (fitur, bukan otomatis) ---
+// Window diam secara default. Animasi DVD hanya jalan saat di-trigger manual
+// (tombol di UI), berjalan beberapa detik lalu berhenti kembali.
+let motionTimer = null
+let motionStopAt = 0
+let velocity = { x: 0.6, y: 0.45 }
+
+const DVD_BOUNCE_DURATION_MS = 5000 // jalan 5 detik lalu diam
+
+function runDvdBounce() {
+  motionStopAt = Date.now() + DVD_BOUNCE_DURATION_MS
+  if (motionTimer) return // sudah jalan
+  motionTimer = setInterval(() => {
+    if (!avatarWindow || avatarWindow.isDestroyed()) {
+      stopMotion()
+      return
+    }
+    // Berhenti setelah durasi habis.
+    if (Date.now() >= motionStopAt) {
+      stopMotion()
+      return
+    }
+
+    const b = avatarWindow.getBounds()
+    const { workArea } = screen.getPrimaryDisplay()
+
+    let nx = b.x + velocity.x
+    let ny = b.y + velocity.y
+
+    if (nx <= workArea.x || nx + b.width >= workArea.x + workArea.width) {
+      velocity.x *= -1
+      nx = b.x + velocity.x
+    }
+    if (ny <= workArea.y || ny + b.height >= workArea.y + workArea.height) {
+      velocity.y *= -1
+      ny = b.y + velocity.y
+    }
+
+    avatarWindow.setPosition(Math.round(nx), Math.round(ny))
+  }, 16)
+}
+
+function stopMotion() {
+  if (motionTimer) {
+    clearInterval(motionTimer)
+    motionTimer = null
+  }
+}
+
+function stopAutoDodge() {
+  if (motionTimer) {
+    clearInterval(motionTimer)
+    motionTimer = null
+  }
+}
 
 function createLauncherWindow() {
   launcherWindow = new BrowserWindow({
@@ -42,14 +98,14 @@ function createLauncherWindow() {
 
 function createAvatarWindow(modelPath) {
   avatarWindow = new BrowserWindow({
-    width: 360,
-    height: 480,
+    width: 260,
+    height: 340,
     transparent: true, // kunci desktop pet
     frame: false, // frameless → kita buat drag manual
     hasShadow: false, // hindari bayangan kotak di sekitar karakter
     alwaysOnTop: true,
     skipTaskbar: false,
-    resizable: true,
+    resizable: true, // user tetap bisa resize manual
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       contextIsolation: true,
@@ -76,6 +132,7 @@ function createAvatarWindow(modelPath) {
 
   avatarWindow.on('closed', () => {
     avatarWindow = null
+    stopMotion()
   })
 }
 
@@ -96,9 +153,30 @@ ipcMain.handle('avatar:close', () => {
   if (launcherWindow && !launcherWindow.isDestroyed()) launcherWindow.show()
 })
 
+// IPC: trigger animasi DVD bounce (fitur/emote).
+ipcMain.handle('avatar:dvd-bounce', () => {
+  runDvdBounce()
+  return { ok: true }
+})
+
 // IPC: path model default (dipakai launcher untuk pre-select).
 ipcMain.handle('avatar:default-model', () => {
   return join(__dirname, '../../assets/models/default.vrm')
+})
+
+// IPC: buka dialog pilih file model (native Finder/Explorer).
+// Mengembalikan path file yang dipilih, atau null jika batal.
+ipcMain.handle('avatar:pick-model', async () => {
+  const result = await dialog.showOpenDialog({
+    title: 'Pilih model 3D',
+    properties: ['openFile'],
+    filters: [
+      { name: 'Model 3D', extensions: ['vrm', 'glb', 'gltf', 'pmx', 'pmd', 'fbx'] },
+      { name: 'Semua file', extensions: ['*'] }
+    ]
+  })
+  if (result.canceled || result.filePaths.length === 0) return null
+  return result.filePaths[0]
 })
 
 // IPC: token Hermes gateway (dibaca dari env saat app diluncurkan).
@@ -107,6 +185,75 @@ ipcMain.handle('avatar:hermes-config', () => {
   return {
     wsUrl: process.env['HERMES_WS_URL'] || 'ws://127.0.0.1:9119/api/ws',
     token: process.env['HERMES_DASHBOARD_SESSION_TOKEN'] || ''
+  }
+})
+
+// IPC: TTS — jalur utama memakai endpoint /api/audio/speak milik Hermes
+// (dashboard backend, provider edge-tts Hermes yang terbukti stabil).
+// Endpoint Bing lama yang dipakai msedge-tts sering menolak (HTTP 403),
+// jadi msedge-tts hanya dipakai sebagai fallback bila Hermes tidak hidup.
+function resolveTtsUrl() {
+  const wsUrl = process.env['HERMES_WS_URL'] || 'ws://127.0.0.1:9119/api/ws'
+  try {
+    const u = new URL(wsUrl)
+    u.protocol = u.protocol === 'wss:' ? 'https:' : 'http:'
+    u.pathname = '/api/audio/speak'
+    u.search = ''
+    u.hash = ''
+    return u.toString()
+  } catch {
+    return 'http://127.0.0.1:9119/api/audio/speak'
+  }
+}
+
+ipcMain.handle('avatar:tts', async (_event, text, voice) => {
+  const token = process.env['HERMES_DASHBOARD_SESSION_TOKEN'] || ''
+  const ttsUrl = resolveTtsUrl()
+
+  // 1) Jalur utama: endpoint TTS Hermes.
+  try {
+    const resp = await fetch(ttsUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Hermes-Session-Token': token
+      },
+      body: JSON.stringify({ text: String(text) })
+    })
+    if (resp.ok) {
+      const data = await resp.json()
+      if (data && data.ok && data.data_url) {
+        return {
+          ok: true,
+          dataUrl: data.data_url,
+          mimeType: data.mime_type || 'audio/mpeg'
+        }
+      }
+      return {
+        ok: false,
+        error: `Hermes TTS endpoint error (${resp.status}): ${JSON.stringify(data)}`
+      }
+    }
+    return { ok: false, error: `Hermes TTS endpoint HTTP ${resp.status}` }
+  } catch {
+    // Hermes tidak terjangkau → jatuh ke fallback msedge-tts di bawah.
+  }
+
+  // 2) Fallback: msedge-tts langsung (butuh ws/stream/Buffer Node).
+  try {
+    const { MsEdgeTTS, OUTPUT_FORMAT } = await import('msedge-tts')
+    const tts = new MsEdgeTTS()
+    await tts.setMetadata(voice || 'id-ID-GadisNeural', OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3)
+
+    const stream = tts.toStream(String(text))
+    const chunks = []
+    for await (const chunk of stream) {
+      chunks.push(Buffer.from(chunk))
+    }
+    const buffer = Buffer.concat(chunks)
+    return { ok: true, base64: buffer.toString('base64'), mimeType: 'audio/mpeg' }
+  } catch (err) {
+    return { ok: false, error: err?.message || String(err) }
   }
 })
 
@@ -191,5 +338,6 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
+  stopMotion()
   if (process.platform !== 'darwin') app.quit()
 })

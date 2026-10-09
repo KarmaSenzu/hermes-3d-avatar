@@ -77,6 +77,15 @@ export class HermesClient {
   }
 
   /**
+   * Daftarkan listener debug yang dipanggil untuk SETIAP event masuk.
+   * Berguna untuk melihat event apa saja yang diterima client.
+   */
+  onAny(handler) {
+    if (!this._anyHandlers) this._anyHandlers = new Set()
+    this._anyHandlers.add(handler)
+  }
+
+  /**
    * Kirim request JSON-RPC → Promise hasil.
    */
   request(method, params = {}) {
@@ -113,6 +122,27 @@ export class HermesClient {
     return this.request('prompt.submit', { session_id: this.sessionId, text })
   }
 
+  /**
+   * Aktifkan mode suara (syarat sebelum voice.record).
+   *
+   * PENTING: sertakan session_id — tanpa ini, server mengarahkan event suara
+   * (voice.status / voice.transcript) ke sid kosong, sehingga frame-nya jatuh
+   * ke stdout (log hermes serve) dan tidak pernah sampai ke WebSocket avatar.
+   */
+  async voiceToggle(action = 'on') {
+    return this.request('voice.toggle', { action, session_id: this.sessionId })
+  }
+
+  /**
+   * Mulai/hentikan rekaman (push-to-talk). Hasil transkripsi datang lewat
+   * event `voice.transcript`.
+   *
+   * PENTING: sertakan session_id — alasan sama seperti voiceToggle di atas.
+   */
+  async voiceRecord(action = 'start') {
+    return this.request('voice.record', { action, session_id: this.sessionId })
+  }
+
   _handleMessage(raw) {
     let frame
     try {
@@ -133,6 +163,14 @@ export class HermesClient {
     // Event server.
     if (frame.method === 'event' && frame.params?.type) {
       const type = frame.params.type
+      // Debug: log semua event yang diterima.
+      if (typeof console !== 'undefined') {
+        console.log('[hermes event]', type, JSON.stringify(frame.params?.payload ?? {}))
+      }
+      // Listener debug (semua event).
+      if (this._anyHandlers) {
+        for (const h of this._anyHandlers) h(frame.params)
+      }
       const handlers = this.eventHandlers.get(type)
       if (handlers) {
         for (const h of handlers) h(frame.params)

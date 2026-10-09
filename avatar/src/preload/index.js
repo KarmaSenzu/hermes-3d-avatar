@@ -23,11 +23,20 @@ const api = {
   // Avatar: tutup / kembali ke launcher.
   closeAvatar: () => ipcRenderer.invoke('avatar:close'),
 
+  // Trigger animasi DVD bounce (emote/skill).
+  dvdBounce: () => ipcRenderer.invoke('avatar:dvd-bounce'),
+
   // Akses path model default (baca dari argumen/env, bukan hardcode mesin lain).
   getDefaultModelPath: () => ipcRenderer.invoke('avatar:default-model'),
 
+  // Buka dialog pilih file model (native Finder/Explorer) → path | null.
+  pickModelFile: () => ipcRenderer.invoke('avatar:pick-model'),
+
   // Konfigurasi Hermes gateway (WS URL + token dari env).
-  getHermesConfig: () => ipcRenderer.invoke('avatar:hermes-config')
+  getHermesConfig: () => ipcRenderer.invoke('avatar:hermes-config'),
+
+  // TTS: kirim teks → dapatkan audio base64 (diproses di main process).
+  synthesizeSpeech: (text, voice) => ipcRenderer.invoke('avatar:tts', text, voice)
 }
 
 contextBridge.exposeInMainWorld('hermesAvatar', api)

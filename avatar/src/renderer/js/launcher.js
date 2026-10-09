@@ -5,6 +5,7 @@
 
 const pathInput = document.getElementById('model-path')
 const startBtn = document.getElementById('start-btn')
+const browseBtn = document.getElementById('browse-btn')
 const statusEl = document.getElementById('status')
 
 async function init() {
@@ -18,6 +19,19 @@ async function init() {
     statusEl.textContent = `Info: ${err.message}`
   }
 }
+
+// Tombol "Pilih…" → buka native file dialog (Finder/Explorer).
+browseBtn.addEventListener('click', async () => {
+  try {
+    const filePath = await window.hermesAvatar.pickModelFile()
+    if (filePath) {
+      pathInput.value = filePath
+      statusEl.textContent = `Dipilih: ${filePath}`
+    }
+  } catch (err) {
+    statusEl.textContent = `Gagal buka dialog: ${err.message}`
+  }
+})
 
 startBtn.addEventListener('click', async () => {
   const modelPath = pathInput.value.trim()

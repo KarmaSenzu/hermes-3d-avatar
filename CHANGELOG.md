@@ -4,6 +4,12 @@ Semua perubahan penting pada project ini dicatat di sini.
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/),
 dan versioning mengikuti [Semantic Versioning](https://semver.org/).
 
+> **Kebijakan release:** Project masih tahap pengembangan & pengujian. Semua
+> perubahan dicatat di bawah `[Unreleased]` **tanpa nomor versi**. Nomor versi
+> (1.0.0, 1.1.0, dst.) hanya ditetapkan **tepat sebelum release** yang diputuskan
+> user, saat produk dianggap stabil dan bebas bug. Tidak ada tag/release GitHub
+> selama pengembangan.
+
 ## [Unreleased]
 
 ### Fase 2 — Integrasi Hermes (WS A) — 2026-10-09
@@ -62,6 +68,9 @@ dan versioning mengikuti [Semantic Versioning](https://semver.org/).
 ---
 
 ## [0.0.0] — Fase 0 — Persiapan — 2026-10-09
+
+> **Catatan:** Fase 0 bukan rilis — hanya penanda milestone pengembangan.
+> Versi resmi (1.0.0) akan ditetapkan saat release final.
 
 - Visi, goals, dan keputusan arsitektur (Electron + three.js + three-vrm + MMD.js).
 - Jawaban Hermes terkunci: `hermes serve` sebagai bridge, Edge TTS (id-ID),

@@ -7,6 +7,99 @@
 
 ---
 
+## ⏳ Tugas Manual yang Sedang Aktif
+
+### T4 — Konfigurasi persona `avatar` (jawaban ringkas + tag emosi)
+
+Berdasarkan jawaban Hermes (`hermes-qa/06-natural-conversation.md`), untuk
+membuat Hermes menjawab ringkas + natural + tag emosi, edit
+`~/.hermes/config.yaml`:
+
+**1. Tambah persona `avatar` di bawah `agent:`:**
+
+```yaml
+agent:
+  personalities:
+    avatar: >
+      Kamu adalah asisten suara dengan avatar 3D. Selalu jawab dengan gaya
+      ngobrol santai, ringkas, dan natural seperti manusia.
+      ATURAN WAJIB:
+      1. Jawab maksimal 1-2 kalimat pendek.
+      2. Jangan langsung ceramah. Setelah jawaban inti, tawarkan detail dengan
+         pertanyaan balik singkat (mis. "Mau aku jelaskan lebih detail?").
+      3. Awali SETIAP jawaban dengan tag emosi: [emotion:happy],
+         [emotion:neutral], [emotion:thinking], [emotion:surprised], atau
+         [emotion:sad]. Lalu lanjutkan teks jawaban.
+      4. Teks polos tanpa markdown, tanpa emoji berlebihan.
+      5. Kalimat enak dibaca TTS (hindari singkatan/simbol aneh).
+      6. Jawab dalam bahasa yang sama dengan user.
+```
+
+**2. Set persona aktif:**
+
+```yaml
+display:
+  personality: avatar
+```
+
+**3. Restart hermes serve:**
+
+```bash
+HERMES_DASHBOARD_SESSION_TOKEN=avatar-dev-token-123 hermes serve --host 127.0.0.1 --port 9119
+```
+
+**4. Verifikasi (opsional):**
+
+```bash
+hermes -z "Ada apa hari ini?"
+```
+
+Harusnya jawab ringkas dengan tag emosi di awal.
+
+> Catatan: AI sudah menyiapkan pemotong tag emosi di sisi avatar — tag
+> `[emotion:...]` otomatis dipotong sebelum TTS & bubble, dan dipakai untuk
+> ekspresi wajah.
+
+---
+
+## ⏳ Tugas Manual yang Sedang Aktif (Fase 3 / P0)
+
+### T3 — Install dependency baru (msedge-tts) + test suara
+
+AI sudah implementasi P0 (TTS + lip sync + STT + emosi). Perlu install ulang
+dependency lalu test.
+
+**1. Install dependency baru:**
+
+```bash
+cd "/Users/damarfikrie/Documents/Coding/Hermes 3D Avatar (Asisten Ai ) /avatar"
+npm install
+```
+
+**2. Jalankan Hermes serve (terminal 1):**
+
+```bash
+HERMES_DASHBOARD_SESSION_TOKEN=avatar-dev-token-123 hermes serve --host 127.0.0.1 --port 9119
+```
+
+**3. Jalankan avatar (terminal 2):**
+
+```bash
+cd "/Users/damarfikrie/Documents/Coding/Hermes 3D Avatar (Asisten Ai ) /avatar"
+HERMES_DASHBOARD_SESSION_TOKEN=avatar-dev-token-123 npm run dev
+```
+
+**4. Test fitur suara:**
+- [ ] Kirim pesan teks → avatar **berbicara** (TTS edge-tts, suara id-ID).
+- [ ] Mulut avatar **bergerak** mengikuti suara (lip sync amplitude).
+- [ ] Klik tombol 🎤 → bicara → teks transkripsi muncul → Hermes menjawab.
+- [ ] Ekspresi berubah sesuai emosi jawaban (happy/sad/neutral).
+
+> Kalau TTS gagal, cek koneksi internet (edge-tts butuh online). Kalau mic gagal,
+> pastikan Hermes punya akses mic (macOS: izinkan terminal/aplikasi pakai mic).
+
+---
+
 ## ⏳ Tugas Manual yang Sedang Aktif (Fase 2)
 
 ### T2 — Jalankan `hermes serve` + test chat nyata
