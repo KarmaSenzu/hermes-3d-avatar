@@ -1,0 +1,33 @@
+# Dependencies / build output
+node_modules/
+dist/
+out/
+release/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Generated audio cache (TTS)
+assets/audio/cache/
+
+# Python (hermes-plugin)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
