@@ -1,0 +1,25 @@
+{
+  "name": "hermes-3d-avatar",
+  "version": "0.1.0",
+  "description": "Hermes 3D Avatar — desktop pet 3D (Electron + three.js + three-vrm)",
+  "private": true,
+  "type": "module",
+  "main": "./out/main/index.js",
+  "author": "KarmaSenzu",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "start": "electron-vite preview"
+  },
+  "dependencies": {
+    "@pixiv/three-vrm": "^3.3.0",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-vite": "^2.3.0",
+    "vite": "^5.4.0"
+  }
+}

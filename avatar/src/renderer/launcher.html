@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hermes 3D Avatar — Launcher</title>
+    <link rel="stylesheet" href="./styles/launcher.css" />
+  </head>
+  <body>
+    <div class="launcher">
+      <h1>Hermes 3D Avatar</h1>
+      <p class="subtitle">Pilih model, lalu mulai.</p>
+
+      <label class="field">
+        <span>File model</span>
+        <input id="model-path" type="text" placeholder="path/ke/model.vrm" />
+      </label>
+
+      <div class="hint">
+        Format yang didukung: <code>.vrm</code> (utama), <code>.glb</code>, <code>.pmx/.pmd</code> (MMD), <code>.fbx</code>.
+      </div>
+
+      <button id="start-btn" class="primary">Mulai</button>
+      <div id="status" class="status"></div>
+    </div>
+
+    <script type="module" src="./js/launcher.js"></script>
+  </body>
+</html>

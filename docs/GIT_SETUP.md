@@ -98,3 +98,69 @@ rm -rf "/Users/damarfikrie/Documents/Coding/Hermes 3D Avatar (Asisten Ai ) /ques
 
 - Setelah ini, setiap commit ikuti **Conventional Commits** (lihat `CONTRIBUTING.md`).
 - `main` adalah branch utama & stabil.
+
+---
+
+## Commit Fase 1 — Prototipe Visual (MVP)
+
+> **Status:** SIAP DIJALANKAN (oleh user di terminal)
+
+### Strategi branch
+
+Gunakan branch fitur `feat/avatar-mvp` untuk pekerjaan Fase 1, lalu merge ke
+`main` setelah stabil. Ini menjaga `main` selalu bersih.
+
+```bash
+cd "/Users/damarfikrie/Documents/Coding/Hermes 3D Avatar (Asisten Ai ) "
+
+# 1. Buat & pindah ke branch fitur
+git checkout -b feat/avatar-mvp
+
+# 2. Pastikan node_modules TIDAK ter-stage (sudah di .gitignore)
+git status
+
+# 3. Stage semua perubahan Fase 1
+git add .
+
+# 4. Commit dengan pesan jelas (Conventional Commits)
+git commit -m "feat(avatar): implement Fase 1 MVP (transparent window, multi-format model loader, idle animation, launcher)"
+```
+
+### Deskripsi singkat commit (untuk GitHub)
+
+Judul: `feat(avatar): implement Fase 1 MVP`
+
+Isi (bisa dipakai saat merge/pull request):
+
+```
+Implementasi Fase 1 (Prototipe Visual MVP):
+
+- Electron window transparan + always-on-top + frameless + draggable.
+- Launcher untuk pilih model lalu Start.
+- Loader model multi-format: .vrm (three-vrm), .glb/.gltf (GLTFLoader),
+  .pmx/.pmd (MMDLoader), .fbx (FBXLoader).
+- Custom protocol model:// untuk serve file model + texture dari disk.
+- Animasi idle: blink (blendshape) + napas.
+- Framing kamera otomatis (full-body) + komposisi tunable + responsive.
+- Input teks mock (chat dummy, belum terhubung ke Hermes).
+- Build tooling: Vite + electron-vite.
+- Docs: CHANGELOG, CONTRIBUTING, ARCHITECTURE, API_BRIDGE, ROADMAP, dll.
+```
+
+### Push branch ke GitHub
+
+```bash
+git push -u origin feat/avatar-mvp
+```
+
+### Merge ke main (setelah diuji)
+
+```bash
+git checkout main
+git merge feat/avatar-mvp
+git push origin main
+```
+
+> **Catatan:** Kalau kamu belum commit Fase 0 sebelumnya (repo masih kosong),
+> jalankan dulu bagian "Skenario A" di atas untuk commit awal, baru lanjut ke
+> commit Fase 1 ini.

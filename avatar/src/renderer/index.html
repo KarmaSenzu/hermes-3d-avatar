@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hermes Avatar</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body>
+    <!-- Kontainer three.js (canvas dibuat dinamis) -->
+    <div id="app" class="stage"></div>
+
+    <!-- Area drag untuk memindahkan window (karena frameless) -->
+    <div id="drag-handle" class="drag-handle" title="Seret untuk memindahkan"></div>
+
+    <!-- Input teks mini (mock, Fase 1) -->
+    <div id="chat" class="chat">
+      <div id="chat-log" class="chat-log"></div>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" type="text" placeholder="Ketik pesan..." autocomplete="off" />
+        <button type="submit">Kirim</button>
+      </form>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

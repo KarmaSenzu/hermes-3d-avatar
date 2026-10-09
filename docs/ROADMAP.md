@@ -1,7 +1,7 @@
 # Hermes 3D Avatar — Roadmap
 
 > **Versi:** 1.1 (Draft)
-> **Status:** PLANNING — keputusan inti terkunci (jawaban Hermes masuk)
+> **Status:** Fase 0 SELESAI ✅ — Fase 1 SELESAI ✅ — Fase 2 siap dimulai
 > **Terkait:** `GOALS.md`, `ARCHITECTURE.md`, `API_BRIDGE.md`
 
 Roadmap ini memperbarui `GOALS.md` bagian 9 sesuai keputusan final:
@@ -18,15 +18,15 @@ Electron + three.js + MMD drop-in + launcher/settings + cross-platform +
 - [x] Jawab pertanyaan ke Hermes (folder `hermes-qa/`)
 - [x] Tentukan OS target & spesifikasi minimum (lihat `hermes-qa/03`)
 - [x] Pilih model MMD/VRM default (bebas lisensi) → lihat `docs/DECISIONS.md`
-- [ ] Setup folder project + Git init → panduan di `docs/GIT_SETUP.md` (jalankan di terminal)
+- [x] Setup folder project + Git init (selesai — push ke `KarmaSenzu/hermes-3d-avatar`)
 
 ## Fase 1 — Prototipe Visual (MVP)
 
-- [ ] Electron window transparan + always-on-top (frameless, draggable)
-- [ ] Load model MMD (.pmd/.pmx) via MMD.js + fallback VRM/GLB
-- [ ] Animasi idle dasar (blink, napas)
-- [ ] Launcher sederhana: pilih model → Start
-- [ ] Input teks sederhana → tampilkan balasan di UI (mock/dummy dulu)
+- [x] Electron window transparan + always-on-top (frameless, draggable)
+- [x] Load model MMD (.pmd/.pmx) via MMD.js + fallback VRM/GLB
+- [x] Animasi idle dasar (blink, napas)
+- [x] Launcher sederhana: pilih model → Start
+- [x] Input teks sederhana → tampilkan balasan di UI (mock/dummy dulu)
 
 ## Fase 2 — Integrasi Hermes
 
