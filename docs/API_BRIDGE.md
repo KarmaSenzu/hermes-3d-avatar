@@ -1,8 +1,50 @@
 # Hermes 3D Avatar — Spesifikasi Bridge API
 
-> **Versi:** 1.1 (Draft)
-> **Status:** PLANNING — skema selaras dengan jawaban Hermes
-> **Terkait:** `GOALS.md`, `ARCHITECTURE.md`, `../hermes-qa/01-hermes-integration.md`
+> **Versi:** 1.2 (Draft)
+> **Status:** Fase 2 — protokol JSON-RPC aktual terdokumentasi
+> **Terkait:** `GOALS.md`, `ARCHITECTURE.md`, `../hermes-qa/01-hermes-integration.md`, `../hermes-qa/04-chat-integration.md`
+
+---
+
+## 0. Protokol JSON-RPC Aktual (hermes serve) — sumber kebenaran
+
+Jawaban Hermes (`hermes-qa/04-chat-integration.md`) mengonfirmasi protokol
+**JSON-RPC 2.0 over WebSocket** yang sebenarnya. Ini menggantikan asumsi format
+`{type, ts, data}` di bawah (yang dulu masih rancangan). Implementasi nyata:
+
+| Item | Nilai |
+|------|-------|
+| WS URL | `ws://127.0.0.1:9119/api/ws?token=<TOKEN>` |
+| Auth | **Butuh `?token=`** (env `HERMES_DASHBOARD_SESSION_TOKEN`). Bukan tanpa token. |
+| Kirim pesan | RPC `prompt.submit` |
+| Buat session | RPC `session.create` (wajib, dapat `session_id`) |
+| Jawaban final | Event `message.complete` → `payload.text` |
+| Streaming | Event `message.delta` → `payload.text` |
+| Turn dimulai | Event `message.start` |
+
+> ⚠️ **Koreksi auth:** Jawaban Hermes sebelumnya menyebut "tanpa token", tapi
+> inspeksi `hermes_cli/web_server.py` (`@app.websocket("/api/ws")` →
+> `_ws_auth_ok`) menunjukkan endpoint WS **menolak koneksi tanpa kredensial**
+> (close code 4401). Loopback non-gated butuh `?token=<_SESSION_TOKEN>`; gated
+> mode butuh single-use `?ticket=`. Token di-set via env
+> `HERMES_DASHBOARD_SESSION_TOKEN` (atau di-generate random saat server start).
+
+### Frame request (avatar → Hermes)
+
+```json
+{ "jsonrpc": "2.0", "id": "r1", "method": "prompt.submit", "params": { "session_id": "abc123", "text": "Halo" } }
+```
+
+### Frame event (Hermes → avatar)
+
+```json
+{ "jsonrpc": "2.0", "method": "event", "params": { "type": "message.complete", "session_id": "abc123", "payload": { "text": "Halo! ..." } } }
+```
+
+> **Catatan:** Bagian 1–8 di bawah adalah spesifikasi **kanonikal/abstrak** untuk
+> event avatar (thinking/speaking/emotion/action) yang dipakai plugin
+> `avatar-bridge` (WS B). Untuk chat utama (WS A), gunakan protokol JSON-RPC di
+> atas.
 
 ---
 

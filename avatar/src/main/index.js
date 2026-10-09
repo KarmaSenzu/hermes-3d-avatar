@@ -101,6 +101,15 @@ ipcMain.handle('avatar:default-model', () => {
   return join(__dirname, '../../assets/models/default.vrm')
 })
 
+// IPC: token Hermes gateway (dibaca dari env saat app diluncurkan).
+// End-user set HERMES_DASHBOARD_SESSION_TOKEN agar cocok dengan hermes serve.
+ipcMain.handle('avatar:hermes-config', () => {
+  return {
+    wsUrl: process.env['HERMES_WS_URL'] || 'ws://127.0.0.1:9119/api/ws',
+    token: process.env['HERMES_DASHBOARD_SESSION_TOKEN'] || ''
+  }
+})
+
 // IPC: baca file model dari disk → kirim base64 + nama file ke renderer.
 // Renderer tidak bisa akses filesystem langsung, jadi main yang membacakan.
 ipcMain.handle('avatar:read-model', async (_event, modelPath) => {

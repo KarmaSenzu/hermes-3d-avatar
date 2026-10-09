@@ -23,6 +23,31 @@ export class AvatarController {
     return BLINK_INTERVAL_MIN + Math.random() * (BLINK_INTERVAL_MAX - BLINK_INTERVAL_MIN)
   }
 
+  /**
+   * Set ekspresi wajah (VRM blendshape). "thinking"/"neutral"/emosi dasar.
+   * Untuk model non-VRM (MMD/FBX), ini no-op (tidak ada blendshape).
+   */
+  setExpression(name) {
+    if (!this.vrm) return
+    const expression = this.vrm.expressionManager
+    if (!expression) return
+
+    const mapping = {
+      neutral: 'neutral',
+      happy: 'happy',
+      sad: 'sad',
+      angry: 'angry',
+      thinking: 'relaxed'
+    }
+    const target = mapping[name] || 'neutral'
+
+    // Reset semua lalu set target.
+    const names = expression.expressionNameList || []
+    for (const n of names) expression.setValue(n, 0)
+    expression.setValue(target, 1)
+    expression.update()
+  }
+
   update(deltaMs) {
     const now = performance.now()
     this.clock += deltaMs

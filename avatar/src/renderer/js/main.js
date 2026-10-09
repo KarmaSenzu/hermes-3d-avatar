@@ -1,6 +1,7 @@
 import { DesktopPet } from './desktop-pet.js'
 import { loadModelFromBase64, loadMMDModel, loadFBXModel } from './model-loader.js'
 import { AvatarController } from './avatar-controller.js'
+import { HermesClient } from './hermes-client.js'
 
 /**
  * main.js — entry renderer untuk window avatar (index.html).
@@ -66,7 +67,7 @@ window.hermesAvatar.onLoadModel(async (modelPath) => {
   }
 })
 
-// --- Mock chat (Fase 1: belum terhubung ke Hermes) ---
+// --- Chat ke Hermes (Fase 2) ---
 const form = document.getElementById('chat-form')
 const input = document.getElementById('chat-input')
 const chatLog = document.getElementById('chat-log')
@@ -79,17 +80,77 @@ function log(who, text) {
   chatLog.scrollTop = chatLog.scrollHeight
 }
 
-form.addEventListener('submit', (e) => {
+// Inisialisasi client Hermes (connect + buat session).
+let hermes = null
+let hermesReady = false
+let streamingLine = null // div untuk teks streaming (message.delta)
+
+async function initHermes() {
+  try {
+    // Baca WS URL + token dari main process (env saat app diluncurkan).
+    const cfg = await window.hermesAvatar.getHermesConfig()
+    hermes = new HermesClient(cfg.wsUrl, cfg.token)
+
+    await hermes.connect()
+    await hermes.createSession('Avatar chat')
+    hermesReady = true
+    log('avatar', 'Terhubung ke Hermes. Siap! 👋')
+
+    // Jawaban final.
+    hermes.on('message.complete', (evt) => {
+      const text = evt?.payload?.text ?? ''
+      if (streamingLine) {
+        // Ganti isi baris streaming dengan teks final.
+        streamingLine.textContent = `Hermes: ${text}`
+        streamingLine = null
+      } else {
+        log('avatar', text)
+      }
+      controller?.setExpression('neutral')
+    })
+
+    // Streaming delta.
+    hermes.on('message.delta', (evt) => {
+      const chunk = evt?.payload?.text ?? ''
+      if (!streamingLine) {
+        streamingLine = document.createElement('div')
+        streamingLine.className = 'avatar'
+        chatLog.appendChild(streamingLine)
+      }
+      streamingLine.textContent = `Hermes: ${streamingLine.textContent.replace(/^Hermes: /, '')}${chunk}`
+      chatLog.scrollTop = chatLog.scrollHeight
+    })
+
+    // Turn dimulai → thinking.
+    hermes.on('message.start', () => {
+      controller?.setExpression('thinking')
+    })
+  } catch (err) {
+    hermesReady = false
+    log('avatar', `⚠️ Gagal hubung Hermes: ${err.message}`)
+  }
+}
+
+initHermes()
+
+form.addEventListener('submit', async (e) => {
   e.preventDefault()
   const text = input.value.trim()
   if (!text) return
+
   log('user', text)
   input.value = ''
 
-  // Balasan dummy — nanti diganti koneksi ke hermes serve (Fase 2).
-  setTimeout(() => {
-    log('avatar', `(mock) Kamu berkata: "${text}"`)
-  }, 400)
+  if (!hermesReady) {
+    log('avatar', '(offline) Hermes belum terhubung.')
+    return
+  }
+
+  try {
+    await hermes.submitPrompt(text)
+  } catch (err) {
+    log('avatar', `Gagal kirim: ${err.message}`)
+  }
 })
 
 // Tutup window → kembali ke launcher.

@@ -7,7 +7,39 @@
 
 ---
 
-## ⏳ Tugas Manual yang Sedang Aktif (Fase 1)
+## ⏳ Tugas Manual yang Sedang Aktif (Fase 2)
+
+### T2 — Jalankan `hermes serve` + test chat nyata
+
+AI sudah implementasi client Hermes (`hermes-client.js`) & sambungkan chat ke
+Hermes. Untuk test:
+
+**1. Jalankan Hermes serve DENGAN TOKEN (terminal terpisah):**
+
+```bash
+HERMES_DASHBOARD_SESSION_TOKEN=avatar-dev-token-123 hermes serve --host 127.0.0.1 --port 9119
+```
+
+> ⚠️ **PENTING:** endpoint `/api/ws` Hermes **butuh token auth** (bukan tanpa
+> token — temuan baru dari inspeksi `web_server.py`). Set token tetap lewat env
+> `HERMES_DASHBOARD_SESSION_TOKEN`.
+
+**2. Jalankan app avatar dengan token yang SAMA (terminal lain):**
+
+```bash
+cd "/Users/damarfikrie/Documents/Coding/Hermes 3D Avatar (Asisten Ai ) /avatar"
+HERMES_DASHBOARD_SESSION_TOKEN=avatar-dev-token-123 npm run dev
+```
+
+**3. Di launcher klik "Mulai", lalu ketik pesan.** Avatar harusnya:
+- "Terhubung ke Hermes. Siap!".
+- Kirim pesan → Hermes berpikir → jawaban muncul (streaming + final).
+
+> Kalau masih gagal, pastikan token di kedua terminal SAMA dan port 9119 benar.
+
+---
+
+## 📦 Tugas Manual Sebelumnya (Fase 1 — selesai)
 
 ### T0 — Perbaiki "Electron dianggap malware" (SEBELUM download model)
 
@@ -180,7 +212,6 @@ npm run dev
 ```
 
 ### T1b — Test MMD loader (.pmx/.pmd) — OPSIONAL
-
 AI sudah implementasi MMD loader + custom protocol `model://`:
 - `.vrm`/`.glb` → base64 (sudah jalan).
 - `.pmx`/`.pmd` → MMDLoader via URL `model://` (serve file + texture).

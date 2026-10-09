@@ -24,7 +24,10 @@ const api = {
   closeAvatar: () => ipcRenderer.invoke('avatar:close'),
 
   // Akses path model default (baca dari argumen/env, bukan hardcode mesin lain).
-  getDefaultModelPath: () => ipcRenderer.invoke('avatar:default-model')
+  getDefaultModelPath: () => ipcRenderer.invoke('avatar:default-model'),
+
+  // Konfigurasi Hermes gateway (WS URL + token dari env).
+  getHermesConfig: () => ipcRenderer.invoke('avatar:hermes-config')
 }
 
 contextBridge.exposeInMainWorld('hermesAvatar', api)

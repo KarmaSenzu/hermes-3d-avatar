@@ -6,6 +6,28 @@ dan versioning mengikuti [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fase 2 — Integrasi Hermes (WS A) — 2026-10-09
+
+#### Added
+- **`hermes-client.js`**: WebSocket JSON-RPC client untuk `hermes serve`
+  (connect, `session.create`, `prompt.submit`, event handler).
+- **Chat nyata ke Hermes**: input teks → `prompt.submit` → streaming
+  (`message.delta`) + jawaban final (`message.complete`).
+- **Ekspresi thinking/netral**: `message.start` → thinking, `message.complete`
+  → neutral (via `AvatarController.setExpression`).
+- **Konfigurasi gateway**: WS URL + token dibaca dari env
+  (`HERMES_DASHBOARD_SESSION_TOKEN`, `HERMES_WS_URL`) via IPC.
+
+#### Fixed
+- **Auth WS Hermes**: koreksi — endpoint `/api/ws` butuh `?token=` (bukan tanpa
+  token seperti jawaban awal). Token via env `HERMES_DASHBOARD_SESSION_TOKEN`.
+
+#### Known Limitations
+- Plugin `avatar-bridge` (WS B) untuk thinking presisi / emosi via tag / tool
+  event belum diimplementasikan (Fase 2 item 4).
+
+---
+
 ### Fase 1 — Prototipe Visual (MVP) — 2026-10-09
 
 #### Added
