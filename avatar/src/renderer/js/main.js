@@ -125,6 +125,22 @@ async function initHermes() {
     hermes.on('message.start', () => {
       controller?.setExpression('thinking')
     })
+
+    // Thinking presisi (reasoning stream) → pertahankan ekspresi thinking.
+    hermes.on('thinking.delta', () => {
+      controller?.setExpression('thinking')
+    })
+
+    // Tool mulai dipakai → indikator di chat.
+    hermes.on('tool.start', (evt) => {
+      const tool = evt?.payload?.name || evt?.payload?.tool || 'tool'
+      log('avatar', `🔧 Memakai: ${tool}`)
+    })
+
+    // Tool selesai → kembali neutral (siap jawab).
+    hermes.on('tool.complete', () => {
+      controller?.setExpression('neutral')
+    })
   } catch (err) {
     hermesReady = false
     log('avatar', `⚠️ Gagal hubung Hermes: ${err.message}`)

@@ -15,16 +15,14 @@ dan versioning mengikuti [Semantic Versioning](https://semver.org/).
   (`message.delta`) + jawaban final (`message.complete`).
 - **Ekspresi thinking/netral**: `message.start` → thinking, `message.complete`
   → neutral (via `AvatarController.setExpression`).
+- **Event thinking & tool (WS A)**: `thinking.delta` (thinking presisi),
+  `tool.start`/`tool.complete` (indikator tool) — tanpa perlu plugin WS B.
 - **Konfigurasi gateway**: WS URL + token dibaca dari env
   (`HERMES_DASHBOARD_SESSION_TOKEN`, `HERMES_WS_URL`) via IPC.
 
 #### Fixed
 - **Auth WS Hermes**: koreksi — endpoint `/api/ws` butuh `?token=` (bukan tanpa
   token seperti jawaban awal). Token via env `HERMES_DASHBOARD_SESSION_TOKEN`.
-
-#### Known Limitations
-- Plugin `avatar-bridge` (WS B) untuk thinking presisi / emosi via tag / tool
-  event belum diimplementasikan (Fase 2 item 4).
 
 ---
 

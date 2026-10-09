@@ -1,7 +1,7 @@
 # Hermes 3D Avatar — Roadmap
 
 > **Versi:** 1.1 (Draft)
-> **Status:** Fase 0 SELESAI ✅ — Fase 1 SELESAI ✅ — Fase 2 (WS A) SELESAI ✅
+> **Status:** Fase 0 SELESAI ✅ — Fase 1 SELESAI ✅ — Fase 2 SELESAI ✅
 > **Terkait:** `GOALS.md`, `ARCHITECTURE.md`, `API_BRIDGE.md`
 
 Roadmap ini memperbarui `GOALS.md` bagian 9 sesuai keputusan final:
@@ -31,9 +31,9 @@ Electron + three.js + MMD drop-in + launcher/settings + cross-platform +
 ## Fase 2 — Integrasi Hermes
 
 - [x] Connect ke `hermes serve` (WS A, `ws://127.0.0.1:9119/api/ws`) untuk chat utama
-- [x] Event `thinking` (message.start) / `speaking` (message.complete) / `idle` bekerja
+- [x] Event `thinking` (message.start / thinking.delta) / `speaking` (message.complete) / `idle` bekerja
 - [x] Jawaban Hermes muncul di avatar (teks dulu)
-- [ ] Plugin `avatar-bridge` (WS B): thinking presisi, emosi via tag, tool event
+- [x] Event thinking presisi + tool (thinking.delta, tool.start, tool.complete) via WS A (tanpa plugin)
 
 ## Fase 3 — Suara & Lip Sync
 
