@@ -28,7 +28,8 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/renderer/index.html'),
-          launcher: resolve(__dirname, 'src/renderer/launcher.html')
+          launcher: resolve(__dirname, 'src/renderer/launcher.html'),
+          settings: resolve(__dirname, 'src/renderer/settings.html')
         }
       }
     }

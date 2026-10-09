@@ -35,6 +35,9 @@ const api = {
   // Konfigurasi Hermes gateway (WS URL + token dari env).
   getHermesConfig: () => ipcRenderer.invoke('avatar:hermes-config'),
 
+  // Status service (9Router & hermes) untuk settings panel.
+  getServiceStatus: () => ipcRenderer.invoke('avatar:service-status'),
+
   // TTS: kirim teks → dapatkan audio base64 (diproses di main process).
   synthesizeSpeech: (text, voice) => ipcRenderer.invoke('avatar:tts', text, voice)
 }

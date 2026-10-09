@@ -109,6 +109,11 @@ body {
   -webkit-app-region: no-drag;
 }
 
+/* Tombol pengaturan — di bawah tombol emote. */
+.settings-btn {
+  top: 48px;
+}
+
 /* Backdrop (tidak dipakai untuk toggle; biarkan ada untuk kompatibilitas). */
 .sheet-backdrop {
   display: none;

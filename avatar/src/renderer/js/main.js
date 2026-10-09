@@ -115,6 +115,14 @@ if (dvdBtn) {
   })
 }
 
+// Tombol pengaturan → tutup avatar & kembali ke settings.
+const settingsBtn = document.getElementById('settings-btn')
+if (settingsBtn) {
+  settingsBtn.addEventListener('click', () => {
+    window.hermesAvatar.closeAvatar()
+  })
+}
+
 // Escape juga menutup chat (sembunyikan), bukan tutup window.
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {

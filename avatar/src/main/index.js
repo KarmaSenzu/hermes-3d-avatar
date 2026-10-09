@@ -1,6 +1,7 @@
-import { app, BrowserWindow, ipcMain, protocol, net, dialog, screen } from 'electron'
-import { join, dirname, basename, extname } from 'path'
+import { app, BrowserWindow, ipcMain, protocol, dialog, screen } from 'electron'
+import { join, extname } from 'path'
 import { readFile } from 'fs/promises'
+import { startAllServices, stopAllServices, SESSION_TOKEN, isPortOpen, ROUTER_PORT, HERMES_PORT } from './service-manager.js'
 
 /**
  * Main process — Hermes 3D Avatar
@@ -72,11 +73,11 @@ function stopAutoDodge() {
 
 function createLauncherWindow() {
   launcherWindow = new BrowserWindow({
-    width: 420,
+    width: 720,
     height: 560,
-    resizable: false,
+    resizable: true,
     frame: true,
-    title: 'Hermes 3D Avatar — Launcher',
+    title: 'Hermes 3D Avatar — Pengaturan',
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       contextIsolation: true,
@@ -86,9 +87,9 @@ function createLauncherWindow() {
 
   // electron-vite: dev pakai dev server, prod pakai file hasil build.
   if (process.env['ELECTRON_RENDERER_URL']) {
-    launcherWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/launcher.html`)
+    launcherWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/settings.html`)
   } else {
-    launcherWindow.loadFile(join(__dirname, '../renderer/launcher.html'))
+    launcherWindow.loadFile(join(__dirname, '../renderer/settings.html'))
   }
 
   launcherWindow.on('closed', () => {
@@ -179,13 +180,20 @@ ipcMain.handle('avatar:pick-model', async () => {
   return result.filePaths[0]
 })
 
-// IPC: token Hermes gateway (dibaca dari env saat app diluncurkan).
-// End-user set HERMES_DASHBOARD_SESSION_TOKEN agar cocok dengan hermes serve.
+// IPC: token Hermes gateway — pakai SESSION_TOKEN dari service-manager
+// (konsisten antara avatar & hermes serve yang di-spawn otomatis).
 ipcMain.handle('avatar:hermes-config', () => {
   return {
     wsUrl: process.env['HERMES_WS_URL'] || 'ws://127.0.0.1:9119/api/ws',
-    token: process.env['HERMES_DASHBOARD_SESSION_TOKEN'] || ''
+    token: SESSION_TOKEN
   }
+})
+
+// IPC: status service (9Router & hermes) — untuk settings panel.
+ipcMain.handle('avatar:service-status', async () => {
+  const router = await isPortOpen(ROUTER_PORT)
+  const hermes = await isPortOpen(HERMES_PORT)
+  return { router, hermes }
 })
 
 // IPC: TTS — jalur utama memakai endpoint /api/audio/speak milik Hermes
@@ -207,7 +215,7 @@ function resolveTtsUrl() {
 }
 
 ipcMain.handle('avatar:tts', async (_event, text, voice) => {
-  const token = process.env['HERMES_DASHBOARD_SESSION_TOKEN'] || ''
+  const token = SESSION_TOKEN
   const ttsUrl = resolveTtsUrl()
 
   // 1) Jalur utama: endpoint TTS Hermes.
@@ -332,6 +340,18 @@ app.whenReady().then(() => {
   registerModelProtocol()
   createLauncherWindow()
 
+  // Jalankan service (9Router + hermes serve) secara otomatis di background.
+  startAllServices()
+    .then((res) => {
+      console.log('[service-manager]', JSON.stringify({
+        router: res.router.ok ? (res.router.already ? 'already-running' : 'started') : 'failed',
+        hermes: res.hermes.ok ? (res.hermes.already ? 'already-running' : 'started') : 'failed'
+      }))
+    })
+    .catch((err) => {
+      console.error('[service-manager] error:', err?.message || err)
+    })
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createLauncherWindow()
   })
@@ -339,5 +359,6 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   stopMotion()
+  stopAllServices()
   if (process.platform !== 'darwin') app.quit()
 })

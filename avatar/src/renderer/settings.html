@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hermes 3D Avatar — Pengaturan</title>
+    <link rel="stylesheet" href="./styles/launcher.css" />
+  </head>
+  <body>
+    <div class="settings">
+      <!-- Sidebar (kiri) -->
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-dot"></span>
+          <span>Hermes Avatar</span>
+        </div>
+        <nav class="nav" id="nav"></nav>
+        <div class="sidebar-footer">v0.1.0</div>
+      </aside>
+
+      <!-- Panel konten (kanan) -->
+      <main class="content">
+        <!-- HOME -->
+        <section id="panel-home" class="panel active">
+          <h1>Home</h1>
+          <p class="subtitle">Status sistem & mulai.</p>
+
+          <div class="card">
+            <h2>Persiapan</h2>
+            <label class="switch-row">
+              <span>9Router aktif</span>
+              <input id="router-check" type="checkbox" />
+            </label>
+            <div class="service-row">
+              <span>Hermes (otak)</span>
+              <span id="hermes-status" class="badge">…</span>
+            </div>
+            <p class="hint">Centang sebagai pengingat bahwa kamu sudah menjalankan <code>9router</code> di terminal. Hermes otomatis dijalankan oleh app.</p>
+          </div>
+
+          <div class="card">
+            <h2>Karakter Aktif</h2>
+            <div id="active-char" class="active-char"></div>
+          </div>
+
+          <button id="start-btn" class="primary">Mulai</button>
+          <div id="status" class="status"></div>
+        </section>
+
+        <!-- KARAKTER -->
+        <section id="panel-character" class="panel">
+          <h1>Karakter</h1>
+          <p class="subtitle">Kelola & pilih avatar.</p>
+
+          <!-- VIEW 1: daftar format (bisa diklik) -->
+          <div id="format-view">
+            <div class="card">
+              <h2>Format yang Didukung</h2>
+              <div id="format-list" class="format-list"></div>
+            </div>
+          </div>
+
+          <!-- VIEW 2: detail format (info lengkap + tambah + galeri karakter) -->
+          <div id="format-detail-view" class="hidden">
+            <button id="back-to-formats" class="back-btn">‹ Kembali</button>
+            <div id="format-detail" class="format-detail"></div>
+          </div>
+        </section>
+
+        <!-- SUARA -->
+        <section id="panel-voice" class="panel">
+          <h1>Suara</h1>
+          <p class="subtitle">Pengaturan Text-to-Speech & Speech-to-Text.</p>
+
+          <div class="card">
+            <h2>Text-to-Speech</h2>
+            <label class="switch-row">
+              <span>Aktifkan suara</span>
+              <input id="tts-enabled" type="checkbox" />
+            </label>
+            <label class="field">
+              <span>Voice</span>
+              <select id="tts-voice">
+                <option value="id-ID-GadisNeural">Gadis (Perempuan, ID)</option>
+                <option value="id-ID-ArdiNeural">Ardi (Laki-laki, ID)</option>
+                <option value="en-US-AriaNeural">Aria (Perempuan, EN)</option>
+                <option value="en-US-GuyNeural">Guy (Laki-laki, EN)</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="card">
+            <h2>Speech-to-Text</h2>
+            <label class="field">
+              <span>Model Whisper</span>
+              <select id="stt-model">
+                <option value="base">base (ringan)</option>
+                <option value="small">small (lebih akurat)</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Bahasa</span>
+              <select id="stt-language">
+                <option value="id">Indonesia</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <!-- LLM -->
+        <section id="panel-llm" class="panel">
+          <h1>LLM & Provider</h1>
+          <p class="subtitle">Konfigurasi model & koneksi.</p>
+
+          <div class="card">
+            <h2>Tambah Provider</h2>
+            <label class="field">
+              <span>Nama</span>
+              <input id="llm-name" type="text" placeholder="cth. 9Router" />
+            </label>
+            <label class="field">
+              <span>Base URL</span>
+              <input id="llm-base-url" type="text" placeholder="http://localhost:20128/v1" />
+            </label>
+            <label class="field">
+              <span>API Key</span>
+              <input id="llm-api-key" type="password" placeholder="sk-..." />
+            </label>
+            <label class="field">
+              <span>Model</span>
+              <input id="llm-model" type="text" placeholder="cbcn/deepseek-v4-pro" />
+            </label>
+            <button id="llm-add-btn" class="primary">Simpan Provider</button>
+          </div>
+
+          <div class="card">
+            <h2>Provider Tersimpan</h2>
+            <div id="llm-list" class="llm-list"></div>
+          </div>
+        </section>
+
+        <!-- SHORTCUT -->
+        <section id="panel-shortcut" class="panel">
+          <h1>Shortcut</h1>
+          <p class="subtitle">Pintasan keyboard.</p>
+
+          <div class="card">
+            <div class="shortcut-row">
+              <span>Buka / tutup chat</span>
+              <code>💬 (tombol)</code>
+            </div>
+            <div class="shortcut-row">
+              <span>Sembunyikan chat</span>
+              <code>Esc</code>
+            </div>
+            <div class="shortcut-row">
+              <span>Rekam suara</span>
+              <code>🎤 (tombol)</code>
+            </div>
+            <p class="hint">Shortcut global (macOS/Windows/Linux) akan ditambahkan segera.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./js/settings.js"></script>
+  </body>
+</html>
